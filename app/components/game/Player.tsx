@@ -4,7 +4,7 @@ import { forwardRef, useRef, useImperativeHandle } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody, RapierRigidBody, CuboidCollider } from '@react-three/rapier'
 import type * as THREE from 'three'
-import { PLAYER_CONFIG } from '@/app/lib/constants/gameConfig'
+import { PLAYER_CONFIG, PHYSICS_CONFIG } from '@/app/lib/constants/gameConfig'
 
 /**
  * Player.tsx
@@ -125,6 +125,8 @@ const Player = forwardRef<PlayerRef, PlayerProps>(
           type="dynamic"
           mass={PLAYER_CONFIG.mass}
           colliders={false}
+          friction={PHYSICS_CONFIG.friction}
+          restitution={PHYSICS_CONFIG.restitution}
         >
           {/* 胴部分（幅が広い） */}
           <mesh
