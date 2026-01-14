@@ -143,13 +143,13 @@ const Snowboard = forwardRef<SnowboardRef, SnowboardProps>(
       other: { rigidBodyObject?: { name?: string } }
     }) => {
       if (isTerrainCollision(other)) {
-        console.log('Snowboard: Collision with terrain ended')
+        // デバッグログは削除済み
       }
     }
 
     const handleContactForce = (payload: { totalForce: number }) => {
       if (payload.totalForce > 0.1) {
-        console.log(`Snowboard: Contact force: ${payload.totalForce.toFixed(2)}`)
+        // デバッグログは削除済み
       }
     }
 

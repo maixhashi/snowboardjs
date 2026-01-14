@@ -39,6 +39,6 @@ export function logCollision(
   contactPoint: [number, number, number],
   objectName: string
 ): void {
-  console.log(`Collision detected with ${objectName} at:`, contactPoint)
+  // デバッグログは削除済み
 }
 
