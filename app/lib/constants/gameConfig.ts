@@ -115,8 +115,8 @@ export const GAMEPLAY_CONFIG = {
 export const TERRAIN_CONFIG = {
   // 地形のサイズ
   size: {
-    width: 1000,
-    height: 1000,
+    width: 100,
+    height: 100,
   },
   
   // 地形のセグメント数（解像度）
