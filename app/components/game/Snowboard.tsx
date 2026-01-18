@@ -137,22 +137,6 @@ const Snowboard = forwardRef<SnowboardRef, SnowboardProps>(
       }
     }
 
-    const handleCollisionExit = ({
-      other,
-    }: {
-      other: { rigidBodyObject?: { name?: string } }
-    }) => {
-      if (isTerrainCollision(other)) {
-        // デバッグログは削除済み
-      }
-    }
-
-    const handleContactForce = (payload: { totalForce: number }) => {
-      if (payload.totalForce > 0.1) {
-        // デバッグログは削除済み
-      }
-    }
-
     return (
       <group ref={groupRef} position={defaultPosition}>
         <RigidBody
