@@ -24,21 +24,6 @@ const Camera = forwardRef<CameraRef>((props, ref) => {
   const { camera } = useThree()
   const cameraRef = useRef<THREE.Camera>(camera)
 
-  // カメラの初期化（OrbitControlsと競合しないようにコメントアウト）
-  // useEffect(() => {
-  //   const currentCamera = cameraRef.current
-  //   if (!currentCamera) {
-  //     return
-  //   }
-
-  //   // 初期位置と注視点を設定
-  //   const [x, y, z] = CAMERA_CONFIG.initialPosition
-  //   currentCamera.position.set(x, y, z)
-    
-  //   const [lookX, lookY, lookZ] = CAMERA_CONFIG.lookAt
-  //   currentCamera.lookAt(lookX, lookY, lookZ)
-  // }, [])
-
   // 親からアクセス可能にする
   useImperativeHandle(ref, () => ({
     getPosition: () => {
@@ -64,17 +49,6 @@ const Camera = forwardRef<CameraRef>((props, ref) => {
       currentCamera.lookAt(...target)
     },
   }), [])
-
-  // フレームごとの更新（OrbitControlsと競合しないようにコメントアウト）
-  // useFrame((state) => {
-  //   // 将来的にここでプレイヤーの位置を追従する処理を追加
-  //   // 現時点では基本設定のみ
-  //   const currentCamera = cameraRef.current
-  //   if (!currentCamera) {
-  //     return
-  //   }
-  //   cameraRef.current = state.camera
-  // })
 
   // React Three Fiberでは、カメラはCanvasのcamera propで設定されるため
   // このコンポーネントは制御のみを行う（nullを返す）

@@ -29,16 +29,3 @@ export function getContactPoint(
 export function isTerrainCollision(other: { rigidBodyObject?: { name?: string } }): boolean {
   return other.rigidBodyObject?.name === 'terrain'
 }
-
-/**
- * 衝突情報をログ出力
- * @param contactPoint 衝突点の座標
- * @param objectName 衝突したオブジェクトの名前
- */
-export function logCollision(
-  contactPoint: [number, number, number],
-  objectName: string
-): void {
-  // デバッグログは削除済み
-}
-
