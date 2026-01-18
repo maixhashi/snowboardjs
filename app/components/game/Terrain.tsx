@@ -1,7 +1,7 @@
 'use client'
 
 import { RigidBody } from '@react-three/rapier'
-import { TERRAIN_CONFIG } from '@/app/lib/constants/gameConfig'
+import { TERRAIN_CONFIG, PHYSICS_CONFIG } from '@/app/lib/constants/gameConfig'
 
 /**
  * Terrain.tsx
@@ -15,7 +15,13 @@ export default function Terrain() {
   const { size, snowColor } = TERRAIN_CONFIG
 
   return (
-    <RigidBody type="fixed" colliders="cuboid">
+    <RigidBody
+      type="fixed"
+      colliders="cuboid"
+      friction={PHYSICS_CONFIG.friction}
+      restitution={PHYSICS_CONFIG.restitution}
+      name="terrain"
+    >
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}

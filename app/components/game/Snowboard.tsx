@@ -4,7 +4,8 @@ import { forwardRef, useRef, useImperativeHandle } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody, RapierRigidBody } from '@react-three/rapier'
 import type * as THREE from 'three'
-import { PLAYER_CONFIG } from '@/app/lib/constants/gameConfig'
+import { PLAYER_CONFIG, PHYSICS_CONFIG } from '@/app/lib/constants/gameConfig'
+import { getContactPoint, isTerrainCollision } from '@/app/lib/utils/collision'
 
 /**
  * Snowboard.tsx
@@ -120,6 +121,21 @@ const Snowboard = forwardRef<SnowboardRef, SnowboardProps>(
       groupRef.current.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
     })
 
+    // 衝突判定イベントハンドラー
+    const handleCollisionEnter = ({
+      manifold,
+      target,
+      other,
+    }: {
+      manifold: { solverContactPoint: (index: number) => { x: number; y: number; z: number } }
+      target: { rigidBodyObject?: { name?: string } }
+      other: { rigidBodyObject?: { name?: string } }
+    }) => {
+      if (isTerrainCollision(other)) {
+        const contactPoint = getContactPoint(manifold)
+      }
+    }
+
     return (
       <group ref={groupRef} position={defaultPosition}>
         <RigidBody
@@ -127,6 +143,12 @@ const Snowboard = forwardRef<SnowboardRef, SnowboardProps>(
           type="dynamic"
           mass={SNOWBOARD_MASS}
           colliders="cuboid"
+          friction={PHYSICS_CONFIG.friction}
+          restitution={PHYSICS_CONFIG.restitution}
+          ccd={true}
+          onCollisionEnter={handleCollisionEnter}
+          onCollisionExit={handleCollisionExit}
+          onContactForce={handleContactForce}
         >
           <mesh castShadow receiveShadow>
             <boxGeometry args={[SNOWBOARD_SIZE.width, SNOWBOARD_SIZE.height, SNOWBOARD_SIZE.depth]} />
