@@ -1,14 +1,12 @@
 'use client'
 
-import { Suspense, useRef, useCallback } from 'react'
+import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Environment, OrbitControls } from '@react-three/drei'
-import { useFixedJoint, RapierRigidBody } from '@react-three/rapier'
 import { CAMERA_CONFIG, RENDERING_CONFIG } from '@/app/lib/constants/gameConfig'
 import Physics from './Physics'
 import Terrain from './Terrain'
-import Snowboard, { SnowboardRef } from './Snowboard'
-import Player, { PlayerRef } from './Player'
+import Player from './Player'
 
 /**
  * Scene.tsx
@@ -19,46 +17,6 @@ import Player, { PlayerRef } from './Player'
  * - 環境設定
  * - 子コンポーネント（Physics、Terrain、Camera）の配置
  */
-
-function PlayerWithSnowboard() {
-  const playerRef = useRef<PlayerRef>(null)
-  const snowboardRef = useRef<SnowboardRef>(null)
-  const playerRigidBodyRef = useRef<RapierRigidBody | null>(null)
-  const snowboardRigidBodyRef = useRef<RapierRigidBody | null>(null)
-
-  // PlayerのRigidBodyが準備できたときのコールバック
-  const handlePlayerRigidBodyReady = useCallback((rigidBody: RapierRigidBody) => {
-    playerRigidBodyRef.current = rigidBody
-  }, [])
-
-  // SnowboardのRigidBodyが準備できたときのコールバック
-  const handleSnowboardRigidBodyReady = useCallback((rigidBody: RapierRigidBody) => {
-    snowboardRigidBodyRef.current = rigidBody
-  }, [])
-
-  // Playerの足の位置（胴体の下端）とSnowboardの上端を接続
-  // Playerの足の位置: [0, -PLAYER_SIZE.body.height / 2, 0] (Playerのローカル座標)
-  // Snowboardの上端: [0, SNOWBOARD_SIZE.height / 2, 0] (Snowboardのローカル座標)
-  useFixedJoint(
-    playerRigidBodyRef,
-    snowboardRigidBodyRef,
-    [
-      // Playerのローカル座標での接続点（足の位置）
-      [0, -1.4 / 2, 0], // PLAYER_SIZE.body.height / 2
-      [0, 0, 0, 1], // 回転（クォータニオン）
-      // Snowboardのローカル座標での接続点（上端）
-      [0, 0.02 / 2, 0], // SNOWBOARD_SIZE.height / 2
-      [0, 0, 0, 1], // 回転（クォータニオン）
-    ]
-  )
-
-  return (
-    <>
-      <Snowboard ref={snowboardRef} onRigidBodyReady={handleSnowboardRigidBodyReady} />
-      <Player ref={playerRef} onRigidBodyReady={handlePlayerRigidBodyReady} />
-    </>
-  )
-}
 
 export default function Scene() {
   return (
@@ -102,7 +60,7 @@ export default function Scene() {
         <Suspense fallback={null}>
           <Physics>
             <Terrain />
-            <PlayerWithSnowboard />
+            <Player />
           </Physics>
         </Suspense>
       </Canvas>

@@ -5,13 +5,15 @@ import { useFrame } from '@react-three/fiber'
 import { RigidBody, RapierRigidBody, CuboidCollider } from '@react-three/rapier'
 import type * as THREE from 'three'
 import { PLAYER_CONFIG, PHYSICS_CONFIG } from '@/app/lib/constants/gameConfig'
+import { getContactPoint, isTerrainCollision, logCollision } from '@/app/lib/utils/collision'
 
 /**
  * Player.tsx
  * 
- * プレイヤー（スノーボーダー）の3D表現と物理演算を行うコンポーネント
+ * プレイヤー（スノーボーダー）とスノーボードを統合した3D表現と物理演算を行うコンポーネント
  * - Bullet-proof Architectureパターンに従う
  * - 頭と胴で幅が異なるbox geometry
+ * - スノーボードを足元に配置
  * - Dynamic RigidBody（物理ボディ、compound collider）
  */
 
@@ -26,6 +28,7 @@ export interface PlayerRef {
 interface PlayerProps {
   headColor?: string
   bodyColor?: string
+  snowboardColor?: string
   initialPosition?: [number, number, number]
   onRigidBodyReady?: (rigidBody: RapierRigidBody) => void
 }
@@ -46,11 +49,27 @@ const PLAYER_SIZE = {
   },
 } as const
 
+// スノーボードのサイズ設定（板状：幅広、高さ低い）
+const SNOWBOARD_SIZE = {
+  width: 0.5,  // 幅（X軸）
+  height: 0.02, // 高さ（Y軸、板状なので低い）
+  depth: 1.0,   // 奥行き（Z軸、スノーボードの長さ）
+} as const
+
 // 頭と胴の位置関係（胴の上に頭が配置される）
 const HEAD_OFFSET_Y = PLAYER_SIZE.body.height / 2 + PLAYER_SIZE.head.height / 2
 
+// スノーボードの位置（プレイヤーの足元、胴の下端に接する）
+const SNOWBOARD_OFFSET_Y = -PLAYER_SIZE.body.height / 2 - SNOWBOARD_SIZE.height / 2
+
 const Player = forwardRef<PlayerRef, PlayerProps>(
-  ({ headColor = '#ffdbac', bodyColor = '#ffdbac', initialPosition, onRigidBodyReady }, ref) => {
+  ({ 
+    headColor = '#ffdbac', 
+    bodyColor = '#ffdbac', 
+    snowboardColor = '#87ceeb',
+    initialPosition, 
+    onRigidBodyReady 
+  }, ref) => {
     const groupRef = useRef<THREE.Group>(null)
     const rigidBodyRef = useRef<RapierRigidBody>(null)
     const hasNotifiedRef = useRef(false)
@@ -118,15 +137,51 @@ const Player = forwardRef<PlayerRef, PlayerProps>(
       groupRef.current.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
     })
 
+    // 衝突判定イベントハンドラー
+    const handleCollisionEnter = ({
+      manifold,
+      target,
+      other,
+    }: {
+      manifold: { solverContactPoint: (index: number) => { x: number; y: number; z: number } }
+      target: { rigidBodyObject?: { name?: string } }
+      other: { rigidBodyObject?: { name?: string } }
+    }) => {
+      if (isTerrainCollision(other)) {
+        const contactPoint = getContactPoint(manifold)
+        logCollision(contactPoint, 'terrain')
+      }
+    }
+
+    const handleCollisionExit = ({
+      other,
+    }: {
+      other: { rigidBodyObject?: { name?: string } }
+    }) => {
+      if (isTerrainCollision(other)) {
+        // デバッグログは削除済み
+      }
+    }
+
+    const handleContactForce = (payload: { totalForce: number }) => {
+      if (payload.totalForce > 0.1) {
+        // デバッグログは削除済み
+      }
+    }
+
     return (
       <group ref={groupRef} position={defaultPosition}>
         <RigidBody
           ref={rigidBodyRef}
           type="dynamic"
-          mass={PLAYER_CONFIG.mass}
+          mass={PLAYER_CONFIG.mass + 5} // プレイヤー + スノーボードの質量
           colliders={false}
           friction={PHYSICS_CONFIG.friction}
           restitution={PHYSICS_CONFIG.restitution}
+          ccd={true}
+          onCollisionEnter={handleCollisionEnter}
+          onCollisionExit={handleCollisionExit}
+          onContactForce={handleContactForce}
         >
           {/* 胴部分（幅が広い） */}
           <mesh
@@ -154,6 +209,20 @@ const Player = forwardRef<PlayerRef, PlayerProps>(
           <CuboidCollider
             args={[PLAYER_SIZE.head.width / 2, PLAYER_SIZE.head.height / 2, PLAYER_SIZE.head.depth / 2]}
             position={[0, HEAD_OFFSET_Y, 0]}
+          />
+
+          {/* スノーボード（足元に配置） */}
+          <mesh
+            position={[0, SNOWBOARD_OFFSET_Y, 0]}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[SNOWBOARD_SIZE.width, SNOWBOARD_SIZE.height, SNOWBOARD_SIZE.depth]} />
+            <meshStandardMaterial color={snowboardColor} roughness={0.3} metalness={0.7} />
+          </mesh>
+          <CuboidCollider
+            args={[SNOWBOARD_SIZE.width / 2, SNOWBOARD_SIZE.height / 2, SNOWBOARD_SIZE.depth / 2]}
+            position={[0, SNOWBOARD_OFFSET_Y, 0]}
           />
         </RigidBody>
       </group>
