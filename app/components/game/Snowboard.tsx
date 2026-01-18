@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { RigidBody, RapierRigidBody } from '@react-three/rapier'
 import type * as THREE from 'three'
 import { PLAYER_CONFIG, PHYSICS_CONFIG } from '@/app/lib/constants/gameConfig'
-import { getContactPoint, isTerrainCollision, logCollision } from '@/app/lib/utils/collision'
+import { getContactPoint, isTerrainCollision } from '@/app/lib/utils/collision'
 
 /**
  * Snowboard.tsx
@@ -133,7 +133,6 @@ const Snowboard = forwardRef<SnowboardRef, SnowboardProps>(
     }) => {
       if (isTerrainCollision(other)) {
         const contactPoint = getContactPoint(manifold)
-        logCollision(contactPoint, 'terrain')
       }
     }
 
