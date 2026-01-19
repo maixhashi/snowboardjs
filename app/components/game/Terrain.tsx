@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { RigidBody } from '@react-three/rapier'
-import { BufferGeometry, Float32BufferAttribute } from 'three'
+import { BufferGeometry, Float32BufferAttribute, DoubleSide } from 'three'
 import { TERRAIN_CONFIG, PHYSICS_CONFIG } from '@/app/lib/constants/gameConfig'
 
 /**
@@ -96,6 +96,7 @@ export default function Terrain() {
           color={snowColor}
           roughness={0.8}
           metalness={0.1}
+          side={DoubleSide}
         />
       </mesh>
     </RigidBody>
