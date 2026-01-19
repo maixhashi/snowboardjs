@@ -93,7 +93,7 @@ export default function Terrain() {
         castShadow
       >
         <meshStandardMaterial
-          color={snowColor}
+          color="white"
           roughness={0.8}
           metalness={0.1}
           side={DoubleSide}
