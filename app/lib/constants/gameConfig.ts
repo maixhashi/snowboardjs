@@ -40,8 +40,10 @@ export const PLAYER_CONFIG = {
     depth: 0.3,
   },
   
-  // 初期位置
-  initialPosition: [0, 5, 0] as [number, number, number],
+  // 初期位置（三角柱の手前の高い部分の上に配置）
+  // Y座標: 三角柱の手前の高さ(約57.7m) + プレイヤーの高さ/2 + 余裕
+  // Z座標: 手前側（負の方向）
+  initialPosition: [0, 61, -45] as [number, number, number],
   
   // ジャンプ力
   jumpForce: 5,
@@ -130,5 +132,15 @@ export const TERRAIN_CONFIG = {
   
   // 地形の高さの変動範囲
   heightVariation: 50,
+  
+  // 三角柱地形の設定
+  slope: {
+    // 傾斜角度（度）
+    angle: 30,
+    // 傾斜方向（'z-negative' = Z軸負方向、手前が高い）
+    direction: 'z-negative' as const,
+    // 奥行き（既存のheightを利用）
+    depth: 100,
+  },
 } as const;
 
